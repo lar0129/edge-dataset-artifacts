@@ -13,11 +13,11 @@ size_categories:
 - 100K<n<1M
 ---
 
-# xrag prebuilt artifacts
+# Edge Dataset Artifacts
 
 Eight audited artifact bundles for LihuaWorld, ConcurrentQA, and
 ConcurrentQA-Extended. Download tooling and documentation:
-[lar0129/xrag-artifacts](https://github.com/lar0129/xrag-artifacts).
+[lar0129/edge-dataset-artifacts](https://github.com/lar0129/edge-dataset-artifacts).
 
 `manifest.json` pins an immutable commit containing the archives under
 `releases/v1/` and records per-archive/per-file SHA-256 checksums, install paths,

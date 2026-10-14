@@ -11,7 +11,7 @@ import struct
 import subprocess
 from pathlib import Path
 
-from artifactctl import document_id_fingerprint, sha256
+from artifactctl import DEFAULT_MANIFEST, PROJECT_ROOT, document_id_fingerprint, sha256
 
 
 def text_hash(text):
@@ -204,11 +204,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument(
-        "--sources", type=Path, default=Path(__file__).with_name("sources.json")
+        "--sources", type=Path, default=PROJECT_ROOT / "config" / "sources.json"
     )
-    parser.add_argument(
-        "--output", type=Path, default=Path(__file__).with_name("manifest.json")
-    )
+    parser.add_argument("--output", type=Path, default=DEFAULT_MANIFEST)
     args = parser.parse_args()
     manifest = json.loads(args.sources.read_text())
     connection = sqlite3.connect(

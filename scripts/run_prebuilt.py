@@ -7,6 +7,7 @@ import sys
 from pathlib import Path
 
 from artifactctl import (
+    DEFAULT_MANIFEST,
     document_id_fingerprint,
     read_manifest,
     safe_path,
@@ -55,9 +56,7 @@ def main():
     parser.add_argument(
         "--config", type=Path, required=True, help="An xrag pipeline YAML"
     )
-    parser.add_argument(
-        "--manifest", type=Path, default=Path(__file__).with_name("manifest.json")
-    )
+    parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument(
         "--check-only",
         action="store_true",

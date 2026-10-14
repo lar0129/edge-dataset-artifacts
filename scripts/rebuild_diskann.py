@@ -1,4 +1,4 @@
-"""Build a matching compact DiskANN index from existing corpus embeddings."""
+"""Rebuild a matching compact DiskANN index from existing corpus embeddings."""
 
 import argparse
 import json

@@ -2,10 +2,10 @@
   "schema_version": 1,
   "release": "v1",
   "hub": {
-    "repo_id": "argsLiang/xrag-artifacts",
+    "repo_id": "argsLiang/edge-dataset-artifacts",
     "revision": "aa3808433945e5d1621ddedb4f56ed5006d9149c"
   },
-  "github": "lar0129/xrag-artifacts",
+  "github": "lar0129/edge-dataset-artifacts",
   "artifacts": [
     {
       "id": "lihuaworld-corpus",

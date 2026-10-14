@@ -8,7 +8,13 @@ import subprocess
 import tarfile
 from pathlib import Path
 
-from artifactctl import read_manifest, sha256, verify_directory
+from artifactctl import (
+    DEFAULT_MANIFEST,
+    PROJECT_ROOT,
+    read_manifest,
+    sha256,
+    verify_directory,
+)
 
 
 def write_manifest(path, manifest):
@@ -111,7 +117,7 @@ def upload(manifest, manifest_path, staging):
         ):
             raise ValueError(f"Published archive integrity mismatch: {archive['path']}")
     public = public_manifest(manifest)
-    card = Path(__file__).with_name("DATASET_CARD.md").read_bytes()
+    card = (PROJECT_ROOT / "docs" / "DATASET_CARD.md").read_bytes()
     documentation_commit = api.create_commit(
         repo_id,
         repo_type="dataset",
@@ -123,7 +129,7 @@ def upload(manifest, manifest_path, staging):
             ),
             CommitOperationAdd(
                 path_in_repo="REPRODUCING.md",
-                path_or_fileobj=Path(__file__).with_name("REPRODUCING.md").read_bytes(),
+                path_or_fileobj=(PROJECT_ROOT / "docs" / "REPRODUCING.md").read_bytes(),
             ),
         ],
         commit_message=f"Document xrag artifacts {manifest['release']}",
@@ -152,7 +158,7 @@ def gh_api(endpoint, payload=None):
     return json.loads(completed.stdout)
 
 
-def publish_github(manifest):
+def publish_github(manifest, create_tag=False):
     if not manifest["hub"].get("revision"):
         raise ValueError("Publish Hugging Face archives first")
     repo = manifest["github"]
@@ -162,20 +168,21 @@ def publish_github(manifest):
     branch = details["default_branch"]
     head = gh_api(f"repos/{repo}/git/ref/heads/{branch}")["object"]["sha"]
     commit = gh_api(f"repos/{repo}/git/commits/{head}")
-    directory = Path(__file__).parent
+    directory = PROJECT_ROOT
     names = [
         ".gitignore",
         "README.md",
-        "REPRODUCING.md",
+        "README.en.md",
+        "docs/REPRODUCING.md",
         "requirements.txt",
-        "artifactctl.py",
-        "audit.py",
-        "publish.py",
-        "rebuild_diskann.py",
-        "run_prebuilt.py",
-        "sources.json",
-        "test_artifactctl.py",
-        "DATASET_CARD.md",
+        "scripts/artifactctl.py",
+        "scripts/audit.py",
+        "scripts/publish.py",
+        "scripts/rebuild_diskann.py",
+        "scripts/run_prebuilt.py",
+        "config/sources.json",
+        "tests/test_artifactctl.py",
+        "docs/DATASET_CARD.md",
     ]
     tree = [
         {
@@ -188,11 +195,31 @@ def publish_github(manifest):
     ]
     tree.append(
         {
-            "path": "manifest.json",
+            "path": "manifests/manifest.json",
             "mode": "100644",
             "type": "blob",
             "content": json.dumps(public_manifest(manifest), indent=2) + "\n",
         }
+    )
+    legacy_paths = {
+        "artifactctl.py",
+        "audit.py",
+        "publish.py",
+        "rebuild_diskann.py",
+        "run_prebuilt.py",
+        "sources.json",
+        "test_artifactctl.py",
+        "DATASET_CARD.md",
+        "REPRODUCING.md",
+        "manifest.json",
+    }
+    current_paths = {
+        entry["path"]
+        for entry in gh_api(f"repos/{repo}/git/trees/{commit['tree']['sha']}")["tree"]
+    }
+    tree.extend(
+        {"path": path, "mode": "100644", "type": "blob", "sha": None}
+        for path in sorted(legacy_paths & current_paths)
     )
     tree_result = gh_api(
         f"repos/{repo}/git/trees", {"base_tree": commit["tree"]["sha"], "tree": tree}
@@ -200,7 +227,7 @@ def publish_github(manifest):
     new_commit = gh_api(
         f"repos/{repo}/git/commits",
         {
-            "message": f"Publish xrag artifacts {manifest['release']}",
+            "message": f"Update Edge Dataset Artifacts tooling for {manifest['release']}",
             "tree": tree_result["sha"],
             "parents": [head],
         },
@@ -220,18 +247,20 @@ def publish_github(manifest):
         check=True,
         stdout=subprocess.DEVNULL,
     )
-    gh_api(
-        f"repos/{repo}/git/refs",
-        {"ref": f"refs/tags/{manifest['release']}", "sha": new_commit["sha"]},
-    )
+    if create_tag:
+        gh_api(
+            f"repos/{repo}/git/refs",
+            {"ref": f"refs/tags/{manifest['release']}", "sha": new_commit["sha"]},
+        )
     print(f"Published https://github.com/{repo} at {new_commit['sha']}")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("pack", "upload", "github"))
+    parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument(
-        "--manifest", type=Path, default=Path(__file__).with_name("manifest.json")
+        "--tag", action="store_true", help="Create a new GitHub release tag"
     )
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument(
@@ -244,7 +273,7 @@ def main():
     elif args.command == "upload":
         upload(manifest, args.manifest, args.staging)
     else:
-        publish_github(manifest)
+        publish_github(manifest, create_tag=args.tag)
 
 
 if __name__ == "__main__":

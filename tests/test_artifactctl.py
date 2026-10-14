@@ -2,10 +2,13 @@
 
 import io
 import json
+import sys
 import tarfile
 import tempfile
 import unittest
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
 from artifactctl import (
     document_id_fingerprint,

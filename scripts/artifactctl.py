@@ -10,6 +10,9 @@ import tarfile
 import tempfile
 from pathlib import Path, PurePosixPath
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_MANIFEST = PROJECT_ROOT / "manifests" / "manifest.json"
+
 
 def sha256(path):
     digest = hashlib.sha256()
@@ -35,7 +38,7 @@ def safe_path(root, relative):
         not relative
         or path.is_absolute()
         or any(
-        part in ("", ".", "..") or ":" in part or "\\" in part
+            part in ("", ".", "..") or ":" in part or "\\" in part
             for part in relative.split("/")
         )
     ):
@@ -149,9 +152,7 @@ def select_artifacts(manifest, identifiers=None, datasets=None, kinds=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("list", "download", "verify"))
-    parser.add_argument(
-        "--manifest", type=Path, default=Path(__file__).with_name("manifest.json")
-    )
+    parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
     parser.add_argument("--artifact", action="append")
     parser.add_argument("--dataset", action="append")
     parser.add_argument(
