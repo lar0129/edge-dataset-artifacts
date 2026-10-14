@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "release": "v1",
+  "hub": {"repo_id": "argsLiang/xrag-artifacts", "revision": null},
+  "github": "lar0129/xrag-artifacts",
+  "artifacts": [
+    {
+      "id": "lihuaworld-corpus", "dataset": "lihuaworld", "kind": "corpus",
+      "source": "data/LiHuaWorld", "include": ["data/week*/*.txt", "qa/query_set.json", "qa/query_set.csv"],
+      "install_path": "data/LiHuaWorld", "corpus_id": "lihuaworld_4ed329c09b8e6116",
+      "selection": "425 week documents identical in xrag-new and xrag-old; excludes bakery_deliver, which the integrator does not load. Includes QA."
+    },
+    {
+      "id": "lihuaworld-graph", "dataset": "lihuaworld", "kind": "graph",
+      "source": "../xrag-old/.claude/worktrees/minirag_v002/storage/LiHuaWorld-MiniRAG-Graph-nothinking-qwen3.5-4B",
+      "include": ["graph_chunk_entity_relation.graphml", "kv_store_full_docs.json", "kv_store_text_chunks.json", "vdb_*.json"],
+      "install_path": "storage/LiHuaWorld-MiniRAG-Graph-nothinking-qwen3.5-4B",
+      "corpus_id": "lihuaworld_4ed329c09b8e6116",
+      "selection": "Complete 425/425 matching corpus. Newer April 18/19 candidates cover only 368/407; other old full graphs contain 17 extra documents.",
+      "build": {"llm": "Qwen/Qwen3.5-4B", "embedding_model": "Qwen/Qwen3-Embedding-0.6B", "dimensions": 1024, "chunk_token_size": 120000, "chunk_overlap_token_size": 100, "embedding_max_tokens": 8192, "provenance": "Adjacent historical configuration; original build commit unavailable because worktree gitdir is stale."}
+    },
+    {
+      "id": "lihuaworld-flat", "dataset": "lihuaworld", "kind": "flat",
+      "source": "storage/lihuaworld/f14d686191f1c4e5_1385e726d2260077", "include": ["index.faiss", "index.pkl"],
+      "install_path": "storage/lihuaworld/f14d686191f1c4e5_1385e726d2260077", "corpus_id": "lihuaworld_4ed329c09b8e6116"
+    },
+    {
+      "id": "concurrentqa-graph", "dataset": "concurrentqa", "kind": "graph",
+      "source": "storage/Conc-MiniRAG-Graph-nothinking-qwen3.5-4B-0430-keywordFIX",
+      "include": ["graph_chunk_entity_relation.graphml", "kv_store_full_docs.json", "kv_store_text_chunks.json", "vdb_*.json", "xrag_build_checkpoint.json"],
+      "install_path": "storage/Conc-MiniRAG-Graph-nothinking-qwen3.5-4B-0430-keywordFIX", "corpus_id": "concurrentqa_4ed329c09b8e6116",
+      "selection": "Latest complete graph: 2743/2743; other candidates cover 2700, 2708, or 2740.",
+      "build": {"llm": "Qwen/Qwen3.5-4B", "embedding_model": "Qwen/Qwen3-Embedding-0.6B", "dimensions": 1024}
+    },
+    {
+      "id": "concurrentqa-flat", "dataset": "concurrentqa", "kind": "flat",
+      "source": "storage/concurrentqa/f14d686191f1c4e5_1385e726d2260077", "include": ["index.faiss", "index.pkl"],
+      "install_path": "storage/concurrentqa/f14d686191f1c4e5_1385e726d2260077", "corpus_id": "concurrentqa_4ed329c09b8e6116"
+    },
+    {
+      "id": "concurrentqa-diskann", "dataset": "concurrentqa", "kind": "diskann",
+      "source": "storage/artifact-builds/concurrentqa-diskann-v1", "include": ["leann*"],
+      "install_path": "storage/concurrentqa/f14d686191f1c4e5_0ac1b1dfe7b9d7ca", "corpus_id": "concurrentqa_4ed329c09b8e6116",
+      "selection": "Rebuilt from existing database embeddings for the current 2743-document test corpus. The old 18551-document backup exactly matches the HF train split, overlaps only 1288 current documents, and is excluded."
+    },
+    {
+      "id": "concurrentqa-extended-flat", "dataset": "concurrentqa-extended", "kind": "flat",
+      "source": "storage/concurrentqa-extended/f14d686191f1c4e5_1385e726d2260077", "include": ["index.faiss", "index.pkl"],
+      "install_path": "storage/concurrentqa-extended/f14d686191f1c4e5_1385e726d2260077", "corpus_id": "concurrentqa-extended_4ed329c09b8e6116",
+      "selection": "991397 vectors, 991376 distinct texts. All 21 extra occurrences are duplicate text; original index is preserved."
+    },
+    {
+      "id": "concurrentqa-extended-diskann", "dataset": "concurrentqa-extended", "kind": "diskann",
+      "source": "storage/concurrentqa-extended/f14d686191f1c4e5_0ac1b1dfe7b9d7ca", "include": ["leann*"],
+      "install_path": "storage/concurrentqa-extended/f14d686191f1c4e5_0ac1b1dfe7b9d7ca", "corpus_id": "concurrentqa-extended_4ed329c09b8e6116"
+    }
+  ]
+}
